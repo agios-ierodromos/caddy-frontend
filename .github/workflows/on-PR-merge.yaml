@@ -14,27 +14,21 @@ jobs:
   release:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
 
-    # See_ https://github.com/marketplace/actions/create-release
-    - name: Create Draft Release
-      id: create_release
-      uses: actions/create-release@v1
+    # See: https://github.com/marketplace/actions/create-release
+    - uses: ncipollo/publish-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: <tofill>
-        release_name: <tofill>
+        name: <tofill>
+        tag: <tofill>
+        generateReleaseNotes: true
         draft: true
         prerelease: false
-
-    # See: https://github.com/marketplace/actions/publish-release
-    - uses: eregon/publish-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        release_id: ${{ steps.create_release.outputs.id }}
-        generateReleaseNotes: true
         makeLatest: true
         allowUpdates: true
+        skipIfReleaseExists: true
         updateOnlyUnreleased: true
