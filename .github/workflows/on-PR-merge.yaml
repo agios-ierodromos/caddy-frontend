@@ -3,6 +3,7 @@ name: Publish Release
 # The workflow in the example below runs when the release event triggers with a Pull Request is closed and merged.
 # For more information on the release event.
 # See: [Events that trigger workflows](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#release)
+# See: https://localheinz.com/articles/2022/01/24/creating-releases-with-github-actions/
 
 on:
   pull_request:
@@ -18,17 +19,24 @@ jobs:
       contents: write
     steps:
 
-    # See: https://github.com/marketplace/actions/create-release
-    - uses: ncipollo/release-action@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: "Determine tag"
+      run: "echo \"RELEASE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
+
+    - name: "Create release"
+      uses: "actions/github-script@v5"
       with:
-        name: <tofill>
-        tag: <tofill>
-        generateReleaseNotes: true
-        draft: true
-        prerelease: false
-        makeLatest: true
-        allowUpdates: true
-        skipIfReleaseExists: true
-        updateOnlyUnreleased: true
+        github-token: "${{ secrets.ERGEBNIS_BOT_TOKEN }}"
+        script: |
+          try {
+            await github.rest.repos.createRelease({
+              draft: true,
+              generate_release_notes: true,
+              name: process.env.RELEASE_TAG,
+              owner: context.repo.owner,
+              prerelease: false,
+              repo: context.repo.repo,
+              tag_name: process.env.RELEASE_TAG,
+            });
+          } catch (error) {
+            core.setFailed(error.message);
+          }

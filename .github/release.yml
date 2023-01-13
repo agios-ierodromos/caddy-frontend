@@ -8,19 +8,19 @@ changelog:
       - octocat
   categories:
     - title: Breaking Changes 🛠
+      # see https://semver.org/#summary
       labels:
-        # see https://semver.org/#summary
         - semver-major
         - breaking-change
     - title: Exciting New Features 🎉
+      # see https://semver.org/#summary
       labels:
-        # see https://semver.org/#summary
         - semver-minor
         - enhancement
         - feature
     - title: Bug fixes 🪰
+      # https://semver.org/#summary
       labels:
-        # https://semver.org/#summary
         - semver-patch
         - bug-fix
     - title: Other Changes
