@@ -1,0 +1,40 @@
+name: Publish Docker Image
+
+# The workflow in the example below runs when the release event triggers with a Pull Request is closed and merged.
+# For more information on the release event.
+# See: [Events that trigger workflows](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#release)
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  # The the release job will only run if the pull request was also merged
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+
+    # See_ https://github.com/marketplace/actions/create-release
+    - name: Create Draft Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: <tofill>
+        release_name: <tofill>
+        draft: true
+        generateReleaseNotes: true
+        prerelease: false
+        makeLatest: true
+        allowUpdates: true
+        updateOnlyUnreleased: true
+
+    # See: https://github.com/marketplace/actions/publish-release
+    - uses: eregon/publish-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ steps.create_release.outputs.id }}

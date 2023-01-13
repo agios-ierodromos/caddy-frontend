@@ -24,4 +24,15 @@ RUN xcaddy build \
 
 FROM caddy:2.6.2-alpine
 
+LABEL org.opencontainers.image.title="Caddy Frontend"
+LABEL org.opencontainers.image.name="caddy-frontend"
+LABEL org.opencontainers.image.version="v2.6.2"
+LABEL org.opencontainers.image.description="Caddy webserver with transform-encode, caddy-webhook and caddy-security modules"
+LABEL org.opencontainers.image.base.name="caddy:2.6.2-alpine"
+LABEL org.opencontainers.image.source="https://github.com/agios-ierodromos/caddy-frontend"
+LABEL org.opencontainers.image.url="https://github.com/agios-ierodromos/caddy-frontend"
+LABEL org.opencontainers.image.documentation="https://github.com/agios-ierodromos/caddy-frontend/blob/main/README.md"
+LABEL org.opencontainers.image.authors="alexandre.marcondes@gmail.com"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
