@@ -41,11 +41,11 @@ jobs:
       # Login against a Docker registry
       # See: https://github.com/docker/login-action
       # See: https://github.com/marketplace/actions/docker-login
-      - name: "Log into registry ${{ env.REGISTRY }}"
+      - name: "Log into registry ${{ vars.REGISTRY }}"
         id: registry_login
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ vars.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -56,7 +56,7 @@ jobs:
         id: docker_metadata
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ vars.REGISTRY }}/${{ env.IMAGE_NAME }}
           # set latest tag for default branch
           # SemVer tags, see: https://github.com/marketplace/actions/docker-metadata-action#user-content-semver
           tags: |

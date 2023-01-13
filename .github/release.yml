@@ -7,22 +7,22 @@ changelog:
     authors:
       - octocat
   categories:
-    - title: Breaking Changes 🛠
+    - title: "Breaking Changes 🛠"
       # see https://semver.org/#summary
       labels:
         - semver-major
         - breaking-change
-    - title: Exciting New Features 🎉
+    - title: "Exciting New Features 🎉"
       # see https://semver.org/#summary
       labels:
         - semver-minor
         - enhancement
         - feature
-    - title: Bug fixes 🪰
+    - title: "Bug fixes 🪰"
       # https://semver.org/#summary
       labels:
         - semver-patch
         - bug-fix
-    - title: Other Changes
+    - title: "Other Changes"
       labels:
         - "*"
