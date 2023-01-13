@@ -1,4 +1,4 @@
-name: Publish Docker Image
+name: Publish Release
 
 # The workflow in the example below runs when the release event triggers with a Pull Request is closed and merged.
 # For more information on the release event.
