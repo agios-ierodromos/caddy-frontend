@@ -22,7 +22,7 @@ changelog:
       # https://semver.org/#summary
       labels:
         - semver-patch
-        - bug-fix
+        - bug
     - title: "Other Changes"
       labels:
         - "*"
