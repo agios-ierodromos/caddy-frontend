@@ -1,4 +1,4 @@
-name: Publish Docker Image
+name: "Publish Docker Image"
 
 # The workflow in the example below runs when the release event triggers with the created activity type.
 # For more information on the release event.
@@ -25,14 +25,14 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout repository
+      - name: "Checkout repository"
         id: checkout_repository
         uses: actions/checkout@v3
 
       # Install the cosign tool
       # See: https://github.com/sigstore/cosign-installer
       # See: https://github.com/marketplace/actions/cosign-installer
-      - name: Install cosign
+      - name: "Install cosign"
         id: install_cosign
         uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6 #v2.6.0
         with:
@@ -41,7 +41,7 @@ jobs:
       # Login against a Docker registry
       # See: https://github.com/docker/login-action
       # See: https://github.com/marketplace/actions/docker-login
-      - name: Log into registry ${{ env.REGISTRY }}
+      - name: "Log into registry ${{ env.REGISTRY }}"
         id: registry_login
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
@@ -52,7 +52,7 @@ jobs:
       # Extract metadata (tags, labels) for Docker
       # See: https://github.com/docker/metadata-action
       # See: https://github.com/marketplace/actions/docker-metadata-action
-      - name: Extract Docker metadata
+      - name: "Extract Docker metadata"
         id: docker_metadata
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
@@ -70,7 +70,7 @@ jobs:
       # Build and push Docker image with Buildx
       # See: https://github.com/docker/build-push-action
       # See: https://github.com/marketplace/actions/build-and-push-docker-images
-      - name: Build and push Docker image
+      - name: "Build and push Docker image"
         id: build_and_push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
@@ -87,7 +87,7 @@ jobs:
       # If you would like to publish transparency data even for private images,
       # pass --force to cosign below.
       # See: https://github.com/sigstore/cosign
-      - name: Sign the published Docker image
+      - name: "Sign the published Docker image"
         id: sign_image
         env:
           COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
