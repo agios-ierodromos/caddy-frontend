@@ -1,6 +1,6 @@
 name: "Publish Docker Image"
 
-# The workflow in the example below runs when the release event triggers with the created activity type.
+# The workflow below runs when the release event triggers with the published release type.
 # For more information on the release event.
 # See: [Events that trigger workflows](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#release)
 # See: https://github.com/marketplace/actions/build-and-push-docker-images
@@ -9,10 +9,6 @@ on:
   release:
     types:
       - published
-
-env:
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -25,9 +21,23 @@ jobs:
       id-token: write
 
     steps:
-      - name: "Checkout repository"
+
+      # See: https://github.com/marketplace/actions/thinkdolabs-curl
+      - name: Downloads the organization .env file
+        uses: thinkdolabs/curl@v1
+        with:
+          args: --location -o organization.env https://raw.githubusercontent.com/agios-ierodromos/.github/main/.env
+
+      # See: https://github.com/marketplace/actions/environment-variables-from-dotenv
+      - name: Loads environment variables from .env
+        uses: c-py/action-dotenv-to-setenv@v4
+        with:
+          env-file: organization.env
+
+      # See: https://github.com/marketplace/actions/checkout
+      - name: Checkout repository
+        uses: actions/checkout@$v3.3.0
         id: checkout_repository
-        uses: actions/checkout@v3
 
       # Install the cosign tool
       # See: https://github.com/sigstore/cosign-installer
@@ -41,14 +51,14 @@ jobs:
       # Use Docker buildx to be able to use caches
       # See: https://github.com/docker/build-push-action/blob/e27bcee4eb9e7b4bc168418e3364c4482120393a/docs/advanced/cache.md
       - name: "Set up Docker buildx"
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@$v2.2.1
 
       # Login against a Docker registry
       # See: https://github.com/docker/login-action
       # See: https://github.com/marketplace/actions/docker-login
       - name: "Log into registry ${{ vars.REGISTRY }}"
+        uses: docker/login-action@$v2.1.0
         id: registry_login
-        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
           registry: ${{ vars.REGISTRY }}
           username: ${{ github.actor }}
@@ -58,10 +68,10 @@ jobs:
       # See: https://github.com/docker/metadata-action
       # See: https://github.com/marketplace/actions/docker-metadata-action
       - name: "Extract Docker metadata"
-        id: docker_metadata
-        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        uses: docker/metadata-action@$v4.3.0
+        id: meta
         with:
-          images: ${{ vars.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ vars.REGISTRY }}/${{ github.repository }}
           # set latest tag for default branch
           # SemVer tags, see: https://github.com/marketplace/actions/docker-metadata-action#user-content-semver
           tags: |
@@ -77,14 +87,16 @@ jobs:
       # See: https://github.com/marketplace/actions/build-and-push-docker-images
       - name: "Build and push Docker image"
         id: build_and_push
-        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+        uses: docker/build-push-action@$v3.3.0@$v3.3.0
         with:
           context: .
+          provenance: false
+          sbom: false
           push: true
-          tags: ${{ steps.docker_metadata.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
 
       # Sign the resulting Docker image digest.
       # This will only write to the public Rekor transparency log when the Docker
@@ -99,4 +111,4 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key env://COSIGN_PRIVATE_KEY {}@${{ steps.build_and_push.outputs.digest }}
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign --key env://COSIGN_PRIVATE_KEY --payload README.md {}@${{ steps.build_and_push.outputs.digest }}

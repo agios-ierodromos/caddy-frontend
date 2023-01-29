@@ -1,6 +1,6 @@
-name: Publish Release
+name: "Publish Release"
 
-# The workflow in the example below runs when the release event triggers with a Pull Request is closed and merged.
+# The workflow below runs when the release event triggers with a Pull Request is closed and merged.
 # For more information on the release event.
 # See: [Events that trigger workflows](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#release)
 # See: https://localheinz.com/articles/2022/01/24/creating-releases-with-github-actions/
@@ -19,21 +19,39 @@ jobs:
       contents: write
     steps:
 
+    # See: https://github.com/marketplace/actions/thinkdolabs-curl
+    - name: Downloads the organization .env file
+      uses: thinkdolabs/curl@v1
+      with:
+        args: --location -o organization.env https://raw.githubusercontent.com/agios-ierodromos/.github/main/.env
+
+    # See: https://github.com/marketplace/actions/environment-variables-from-dotenv
+    - name: Loads environment variables from .env
+      uses: c-py/action-dotenv-to-setenv@v4
+      with:
+        env-file: organization.env
+
+    # See: https://github.com/marketplace/actions/github-script
     - name: "Create release"
-      uses: "actions/github-script@v5"
+      uses: "actions/github-script@v6"
       with:
         github-token: "${{ secrets.GITHUB_TOKEN }}"
         script: |
           try {
+            const { repo: { owner, repo } } = context;
+            const tag = "latest";
+
             await github.rest.repos.createRelease({
+              owner,
+              repo,
               draft: true,
+              name: tag,
+              tag_name: tag,
               generate_release_notes: true,
-              name: "latest",
-              owner: context.repo.owner,
               prerelease: false,
-              repo: context.repo.repo,
-              tag_name: "latest",
             });
+
+            core.notice('The "' tag + '"" release is created as draft.');
           } catch (error) {
             core.setFailed(error.message);
           }
